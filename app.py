@@ -42,12 +42,11 @@ if st.button("发送"):
                                 if "choices" in chunk and chunk["choices"]:
                                     content = chunk["choices"][0]["delta"].get("content", "")
                                     response_text += content
-                                    # 实时更新响应内容
-                                    st.markdown(response_text)
                             except json.JSONDecodeError:
                                 continue
                 return response_text
 
         # 调用函数并获取最终响应内容
         final_response = get_streamed_data()
+        st.markdown(final_response)
         st.success("处理完成!")
