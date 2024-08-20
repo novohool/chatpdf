@@ -9,6 +9,10 @@ st.set_page_config(page_title="Llama Chat", page_icon="🦙")
 st.title("Llama Chat")
 st.write("与 Llama 模型进行交互，获取实时响应。")
 
+# 初始化历史消息列表
+if 'history' not in st.session_state:
+    st.session_state.history = []
+
 # 用户输入框
 user_input = st.text_area("输入你的问题:", "9.9和9.11哪个大")
 
@@ -22,9 +26,8 @@ if st.button("发送"):
                 "model": "llama-3.1-405b",
                 "stream": True,
                 "messages": [
-                    {"role": "system", "content": "用中文回答"},
-                    {"role": "user", "content": user_input}
-                ]
+                    {"role": "system", "content": "用中文回答"}
+                ] + st.session_state.history + [{"role": "user", "content": user_input}]
             }
 
             # 使用 stream=True 发送请求以处理流响应
@@ -48,5 +51,15 @@ if st.button("发送"):
 
         # 调用函数并获取最终响应内容
         final_response = get_streamed_data()
+        st.session_state.history.append({"role": "user", "content": user_input})
+        st.session_state.history.append({"role": "assistant", "content": final_response})
         st.markdown(final_response)
         st.success("处理完成!")
+
+# 显示历史消息
+st.write("历史消息:")
+for message in st.session_state.history:
+    if message["role"] == "user":
+        st.write(f"用户：{message['content']}")
+    else:
+        st.write(f"助手：{message['content']}")
