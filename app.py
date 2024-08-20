@@ -77,9 +77,9 @@ def get_rag_chain(vectorstore):
             ]
         )  
     
-    history_aware_retriever=create_history_aware_retriever(retriever,contextualize_q_prompt)
+    history_aware_retriever=create_history_aware_retriever(retriever, contextualize_q_prompt)
     question_answer_chain=create_stuff_documents_chain(qa_prompt)
-    rag_chain=create_retrieval_chain(history_aware_retriever,question_answer_chain)
+    rag_chain=create_retrieval_chain(history_aware_retriever, question_answer_chain)
 
     return rag_chain
 
