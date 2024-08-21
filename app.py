@@ -116,7 +116,7 @@ class LlamaChat:
     
         return documents
         
-    @st.cache_resource(ttl="1h", show_spinner='Processing File(s)..', hash_funcs={"_io.BytesIO": lambda _: None, "__main__.LlamaChat": lambda _: None})
+    @st.cache_resource(ttl="1h", show_spinner='Processing File(s)..', hash_funcs={"_io.BytesIO": lambda _: None, "__main__.LlamaChat": lambda _: None,"langchain.chains.RetrievalQA": lambda _: None})
     def get_vectorstore_from_files(self, files, HF_Embed_Model):
         pdf_docs = self.get_docs_from_files(files)             
         split_docs = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=150).split_documents(pdf_docs)
