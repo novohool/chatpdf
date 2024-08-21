@@ -135,7 +135,7 @@ class LlamaChat:
             "stream": True,
             "messages": [
                 {"role": "system", "content": "用中文回答"}
-            ] + [{"role": msg.role, "content": msg.content} for msg in history] + [{"role": "user", "content": user_input}]
+            ] + [{"role": msg.role, "content": msg.content} for msg in history if isinstance(msg, (HumanMessage, AIMessage))] + [{"role": "user", "content": user_input}]
         }
 
         try:
