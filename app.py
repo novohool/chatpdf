@@ -27,16 +27,22 @@ def start_new_chat():
     st.session_state.query = ""
     st.session_state.store[new_session_id] = ChatMessageHistory()
 
+def initialize_session_state():
+    if 'store' not in st.session_state:
+        st.session_state.store = {}
+    if 'session_id' not in st.session_state:
+        get_new_session()
+    if 'query' not in st.session_state:
+        st.session_state.query = ""
+
 class LlamaChat:
     def __init__(self):
         st.set_page_config(page_title="Llama Chat", page_icon="🦙")
         st.title("Llama Chat")
         st.write("与 Llama 模型进行交互，获取实时响应。")
         
-        if 'session_id' not in st.session_state:
-            start_new_chat()
-        if 'store' not in st.session_state:
-            st.session_state.store = {}
+        initialize_session_state()
+
         if 'button_key' not in st.session_state:
             st.session_state.button_key = 0
         if 'vectorstore' not in st.session_state:
