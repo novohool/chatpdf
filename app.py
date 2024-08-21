@@ -12,6 +12,47 @@ class LlamaChat:
         # 初始化历史消息列表
         if 'history' not in st.session_state:
             st.session_state.history = []
+        # 初始化按钮状态
+        if 'button_key' not in st.session_state:
+            st.session_state.button_key = 0
+
+        # 添加自定义 CSS
+        self.add_custom_css()
+
+    def add_custom_css(self):
+        custom_css = """
+        <style>
+        .stButton button {
+            background-color: #4CAF50; /* 鲜绿色 */
+            color: white;
+            border-radius: 20px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .stButton button:hover {
+            background-color: #45a049; /* 深绿色 */
+        }
+        .stTextInput input, .stTextArea textarea {
+            border-radius: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            transition: border-color 0.3s ease;
+        }
+        .stTextInput input:focus, .stTextArea textarea:focus {
+            border-color: #4CAF50; /* 鲜绿色 */
+            outline: none;
+        }
+        .stMarkdown p {
+            background-color: #e0f7fa; /* 蔚蓝色 */
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        </style>
+        """
+        st.markdown(custom_css, unsafe_allow_html=True)
 
     def get_streamed_data(self, user_input):
         url = "https://llama3.bnnd.eu.org/v1/chat/completions"
@@ -56,9 +97,9 @@ class LlamaChat:
 
     def main(self):
         # 用户输入框
-        user_input = st.text_area("输入你的问题:", "9.9和9.11哪个大")
+        user_input = st.text_area("输入你的问题:", "9.9和9.11哪个大", key=f"input_{st.session_state.button_key}")
 
-        if st.button("发送"):
+        if st.button("发送", key=f"button_{st.session_state.button_key}"):
             with st.spinner("正在处理..."):
                 final_response = self.get_streamed_data(user_input)
                 if final_response:
@@ -66,7 +107,8 @@ class LlamaChat:
                     st.session_state.history.append({"role": "assistant", "content": final_response})
                     st.markdown(final_response)
                     st.success("处理完成!")
-                user_input = st.text_area("继续输入你的问题:", "")
+                st.session_state.button_key += 1
+                st.experimental_rerun()
 
         self.display_history()
 
