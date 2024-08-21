@@ -35,6 +35,8 @@ def initialize_session_state():
         get_new_session()
     if 'query' not in st.session_state:
         st.session_state.query = ""
+    if 'button_key' not in st.session_state:
+        st.session_state.button_key = 0
 
 class LlamaChat:
     def __init__(self):
@@ -44,8 +46,6 @@ class LlamaChat:
         
         initialize_session_state()
 
-        if 'button_key' not in st.session_state:
-            st.session_state.button_key = 0
         if 'vectorstore' not in st.session_state:
             st.session_state.vectorstore = None
 
@@ -179,22 +179,25 @@ class LlamaChat:
             return "No response received."
 
     def main_fragment(self):
-        with st.form(key=f"form_{st.session_state.button_key}", clear_on_submit=True):
+        with st.form(key=f"form_{st.session_state.button_key}", clear_on_submit=False):
             user_input = st.text_area("输入你的问题:", "", key=f"input_{st.session_state.button_key}")
             submit_button = st.form_submit_button(label="发送")
 
             if submit_button:
-                with st.spinner("正在处理..."):
-                    final_response = self.rag_chain(user_input)
-                    if final_response:
-                        history = get_session_history(get_current_session())
-                        history.add_message(HumanMessage(content=user_input))
-                        history.add_message(AIMessage(content=final_response))
-                        st.markdown(final_response)
-                        st.success("处理完成!")
-                        st.session_state.button_key += 1
-                    else:
-                        st.error("处理失败，请重试。")
+                if user_input.strip() == "":
+                    st.error("请输入有效的问题。")
+                else:
+                    with st.spinner("正在处理..."):
+                        final_response = self.rag_chain(user_input)
+                        if final_response:
+                            history = get_session_history(get_current_session())
+                            history.add_message(HumanMessage(content=user_input))
+                            history.add_message(AIMessage(content=final_response))
+                            st.markdown(final_response)
+                            st.success("处理完成!")
+                            st.session_state.button_key += 1
+                        else:
+                            st.error("处理失败，请重试。")
 
         self.display_history()
 
