@@ -124,7 +124,7 @@ class LlamaChat:
         vectorstore = FAISS.from_documents(split_docs, embeddings)
     
         return vectorstore
-    @st.cache_resource(show_spinner='Processing streamed data ...')
+    @st.cache_resource(show_spinner='Processing streamed data ...', hash_funcs={"_io.BytesIO": lambda _: None, "__main__.LlamaChat": lambda _: None,"langchain.chains.RetrievalQA": lambda _: None,"PyPDFLoader": lambda _: None})
     def get_streamed_data(self, user_input):
         url = "https://llama3.bnnd.eu.org/v1/chat/completions"
         headers = {"Content-Type": "application/json"}
@@ -167,7 +167,7 @@ class LlamaChat:
                 st.markdown(f"**用户：** {message.content}")
             else:
                 st.markdown(f"**助手：** {message.content}")
-
+    @st.cache_resource(show_spinner='Processing rag chain ....', hash_funcs={"_io.BytesIO": lambda _: None, "__main__.LlamaChat": lambda _: None,"langchain.chains.RetrievalQA": lambda _: None,"PyPDFLoader": lambda _: None})
     def rag_chain(self, user_input):
         retriever = st.session_state.vectorstore.as_retriever()
         response_text = self.get_streamed_data(user_input)
