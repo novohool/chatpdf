@@ -54,6 +54,7 @@ if st.button("发送"):
         st.session_state.history.append({"role": "user", "content": user_input})
         st.session_state.history.append({"role": "assistant", "content": final_response})
         st.markdown(final_response)
+        st.text_area("输入你的问题:", "")
         st.success("处理完成!")
 
 # 显示历史消息
