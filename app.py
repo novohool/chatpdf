@@ -23,32 +23,44 @@ class LlamaChat:
         custom_css = """
         <style>
         .stButton button {
-            background-color: #4CAF50; /* 鲜绿色 */
+            background-color: #4CAF50;
             color: white;
-            border-radius: 20px;
             padding: 10px 20px;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+            border-radius: 0;
         }
         .stButton button:hover {
-            background-color: #45a049; /* 深绿色 */
+            background-color: #45a049;
+            transform: scale(1.05);
         }
         .stTextInput input, .stTextArea textarea {
-            border-radius: 20px;
             padding: 10px;
             border: 1px solid #ccc;
+            border-radius: 0;
             transition: border-color 0.3s ease;
         }
         .stTextInput input:focus, .stTextArea textarea:focus {
-            border-color: #4CAF50; /* 鲜绿色 */
+            border-color: #4CAF50;
             outline: none;
         }
         .stMarkdown p {
-            background-color: #e0f7fa; /* 蔚蓝色 */
-            border-radius: 10px;
+            background-color: #f7f7f7;
             padding: 10px;
             margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+        }
+        .stForm {
+            padding: 20px;
+            background-color: white;
+            box-shadow: none;
+            border-radius: 0;
+        }
+        .stSpinner {
+            font-size: 16px;
+            color: #4CAF50;
         }
         </style>
         """
@@ -91,26 +103,34 @@ class LlamaChat:
         st.write("历史消息:")
         for message in st.session_state.history:
             if message["role"] == "user":
-                st.write(f"用户：{message['content']}")
+                st.markdown(f"**用户：** {message['content']}")
             else:
-                st.write(f"助手：{message['content']}")
+                st.markdown(f"**助手：** {message['content']}")
 
-    def main(self):
-        # 用户输入框
-        user_input = st.text_area("输入你的问题:", "9.9和9.11哪个大", key=f"input_{st.session_state.button_key}")
+    @st.fragment
+    def main_fragment(self):
+        with st.form(key=f"form_{st.session_state.button_key}", clear_on_submit=True):
+            # 用户输入框
+            user_input = st.text_area("输入你的问题:", "", key=f"input_{st.session_state.button_key}")
+            submit_button = st.form_submit_button(label="发送")
 
-        if st.button("发送", key=f"button_{st.session_state.button_key}"):
-            with st.spinner("正在处理..."):
-                final_response = self.get_streamed_data(user_input)
-                if final_response:
-                    st.session_state.history.append({"role": "user", "content": user_input})
-                    st.session_state.history.append({"role": "assistant", "content": final_response})
-                    st.markdown(final_response)
-                    st.success("处理完成!")
-                st.session_state.button_key += 1
-                st.experimental_rerun()
+            if submit_button:
+                with st.spinner("正在处理..."):
+                    final_response = self.get_streamed_data(user_input)
+                    if final_response:
+                        st.session_state.history.append({"role": "user", "content": user_input})
+                        st.session_state.history.append({"role": "assistant", "content": final_response})
+                        st.markdown(final_response)
+                        st.success("处理完成!")
+                        st.session_state.button_key += 1
+                        st.rerun(scope="fragment")
+                    else:
+                        st.error("处理失败，请重试。")
 
         self.display_history()
+
+    def main(self):
+        self.main_fragment()
 
 if __name__ == "__main__":
     chat = LlamaChat()
