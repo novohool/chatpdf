@@ -97,7 +97,7 @@ class LlamaChat:
         """
         st.markdown(custom_css, unsafe_allow_html=True)
 
-    @st.cache_resource(ttl="1h", show_spinner='Processing File(s).')
+    @st.cache_resource(ttl="1h", show_spinner='Processing File(s).', hash_funcs={"_io.BytesIO": lambda _: None, "__main__.LlamaChat": lambda _: None,"langchain.chains.RetrievalQA": lambda _: None,"PyPDFLoader": lambda _: None})
     def get_docs_from_files(self, files):
         documents = []
         for file in files:
