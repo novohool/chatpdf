@@ -170,9 +170,11 @@ class LlamaChat:
 
     def rag_chain(self, user_input):
         retriever = st.session_state.vectorstore.as_retriever()
-        qa_chain = RetrievalQA.from_chain_type(llm=None, retriever=retriever, chain_type="stuff")
-        response = qa_chain.run(user_input)
-        return response
+        response_text = self.get_streamed_data(user_input)
+        if response_text:
+            return response_text
+        else:
+            return "No response received."
 
     def main_fragment(self):
         with st.form(key=f"form_{st.session_state.button_key}", clear_on_submit=True):
