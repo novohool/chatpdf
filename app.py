@@ -124,7 +124,7 @@ class LlamaChat:
         vectorstore = FAISS.from_documents(split_docs, embeddings)
     
         return vectorstore
-
+    @st.cache_resource(show_spinner='Processing streamed data ...')
     def get_streamed_data(self, user_input):
         url = "https://llama3.bnnd.eu.org/v1/chat/completions"
         headers = {"Content-Type": "application/json"}
