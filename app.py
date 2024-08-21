@@ -8,6 +8,7 @@ from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.memory import ChatMessageHistory
+from langchain.schema import HumanMessage, AIMessage
 
 def get_current_session():
     return st.session_state.session_id
@@ -134,7 +135,7 @@ class LlamaChat:
             "stream": True,
             "messages": [
                 {"role": "system", "content": "用中文回答"}
-            ] + history + [{"role": "user", "content": user_input}]
+            ] + [{"role": msg.role, "content": msg.content} for msg in history] + [{"role": "user", "content": user_input}]
         }
 
         try:
@@ -163,10 +164,11 @@ class LlamaChat:
         st.write("历史消息:")
         history = get_session_history(get_current_session()).messages
         for message in history:
-            if message.role == "user":
+            if isinstance(message, HumanMessage):
                 st.markdown(f"**用户：** {message.content}")
-            else:
+            elif isinstance(message, AIMessage):
                 st.markdown(f"**助手：** {message.content}")
+
     @st.cache_resource(show_spinner='Processing rag chain ....', hash_funcs={"_io.BytesIO": lambda _: None, "__main__.LlamaChat": lambda _: None,"langchain.chains.RetrievalQA": lambda _: None,"PyPDFLoader": lambda _: None})
     def rag_chain(self, user_input):
         retriever = st.session_state.vectorstore.as_retriever()
@@ -186,8 +188,8 @@ class LlamaChat:
                     final_response = self.rag_chain(user_input)
                     if final_response:
                         history = get_session_history(get_current_session())
-                        history.add_user_message(user_input)
-                        history.add_ai_message(final_response)
+                        history.add_message(HumanMessage(content=user_input))
+                        history.add_message(AIMessage(content=final_response))
                         st.markdown(final_response)
                         st.success("处理完成!")
                         st.session_state.button_key += 1
