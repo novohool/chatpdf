@@ -96,7 +96,7 @@ class LlamaChat:
         documents = []
         for file in files:
             filepath = file.name
-            with open(filepath, "wb", encoding="utf-8") as f:
+            with open(filepath, "wb") as f:
                 f.write(file.getvalue())
     
             try:
