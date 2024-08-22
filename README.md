@@ -1,5 +1,6 @@
 # chatpdf
 
+https://github.com/ml2068/askpdf
 
 ```
 ollama server
