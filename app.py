@@ -99,7 +99,7 @@ def main():
         user_question = st.text_input("Ask a question about your PDF:", key="input")
         if user_question:
             with st.spinner('Searching for answer...'):
-                llm = Ollama(model="openllm/causallm:14b-dpo-alpha.Q5_K_M") 
+                llm = Ollama(model="llama3.1:8b") 
                 qa_chain = RetrievalQA.from_chain_type(
                     llm,
                     retriever=knowledge_base.as_retriever(),
